@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<title>Twitter</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+ <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+ <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+<style>
+.form-control{
+	margin-top: 50px;
+	padding: 5px 6px 15px 15px;
+	font-size: 28px;
+	border: 5px solid;
+  -webkit-border-radius: 0;
+     -moz-border-radius: 0;
+          border-radius: 0;
+}
+
+p{
+	line-height: 2px;
+}
+</style>
+
+<script>
+window.onload = function() {
+    // set up the click handler for the form button
+    var button = document.getElementById("submit");
+    button.onclick = getTweets;
+}
+
+
+// when you click "Get Tweets" we call this function
+function getTweets() {
+    // set up a new XHR request
+    var xhr = new XMLHttpRequest();
+    // we're calling search.php and passing in a query string
+    var url = "search.php?query=";
+    var query = document.getElementById("query").value;
+    alert(query);
+    
+    if (!query) {
+        query = "html5";
+    }
+    // we encode the query to handle any special characters properly
+    url += encodeURIComponent(query); //makes any text you type in like #beer #free into %23beer+%23 to append query i.e. q=...
+
+    // this is the function that is called when the XHR request
+    // to our search.php script is handled, and a response sent back
+    xhr.onload = function() {
+    	//alert(url);
+        // if everything went okay, then send the response data
+        // to the displayTweets() function
+        if (xhr.status == 200) {
+            displayTweets(xhr.responseText);
+        } else {
+            var errorDiv = document.getElementById("error");
+            errorDiv.innerHTML = "Error getting tweets: " + xhr.status;
+        }
+    };
+    // make the request!
+    xhr.open("GET", url);
+    xhr.send(null);
+}
+
+function displayTweets(tweets) {
+    // tweets is a big long string, so we need to parse it 
+    // into JSON first
+    tweets = JSON.parse(tweets);
+    var ul = document.querySelector("ul");
+    // clear existing tweets from list
+    while (ul.hasChildNodes()) {
+        ul.removeChild(ul.lastChild);
+    }
+    // add new tweets
+    for (var i = 0; i < tweets.length; i++) {
+        var li = document.createElement("li");
+        li.innerHTML = tweets[i].tweet;
+        ul.appendChild(li);
+    }
+}
+</script>
+</head>
+<body>
+<div class="container">
+	<h1>Infinite happy hourness...WHAT?!??!</h1>
+	<p>using Twitter’s v1.1 REST API....thanks twitter!!</p>
+	<form>
+    	<input id="query" type="text" class="form-control input-lg" placeholder="#freeDrinks #SF #happyHour">
+    	<input 
+    		style="border-radius:0px","font-weight: bold","-webkit-border-radius: 0"
+    		type="button" class="btn btn-info btn-lg"  value="PURO PINCHE PARTY" id="submit">
+	</form>
+	
+	<div id="error"></div>
+	<ul></ul>
+</div>
+</body>
+</html>
